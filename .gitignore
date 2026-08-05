@@ -1,0 +1,27 @@
+# Compiled binaries
+movieLibrary
+/cmd/scan/scan
+
+# SQLite database files (real data, don't commit this)
+data/*.db
+data/*.db-journal
+data/*.db-shm
+data/*.db-wal
+
+# Test artifacts
+internal/db/test_fk.db
+*.test
+
+# Go build/workspace files
+go.work
+go.work.sum
+
+# Editor/OS junk
+.vscode/
+.idea/
+.DS_Store/
+.zed
+
+# Frontend
+web/node_modules/
+web/dist/
