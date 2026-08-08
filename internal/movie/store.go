@@ -75,3 +75,16 @@ func (s *Store) CreateBatch(files []MovieFile) (int, error) {
 
 	return inserted, nil
 }
+
+func (s *Store) GetByID(id int) (Movie, error) {
+	var m Movie
+	row := s.db.QueryRow(
+		"SELECT id, title, file_path, duration_seconds, thumbnail_path, tmdb_id, overview, poster_url, release_year, added_at FROM movies WHERE id = ?",
+		id,
+	)
+	err := row.Scan(&m.ID, &m.Title, &m.FilePath, &m.DurationSeconds, &m.ThumbnailPath, &m.TMDBID, &m.Overview, &m.PosterURL, &m.ReleaseYear, &m.AddedAt)
+	if err != nil {
+		return Movie{}, fmt.Errorf("error getting movie %d: %w", id, err)
+	}
+	return m, nil
+}
