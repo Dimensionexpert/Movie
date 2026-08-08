@@ -14,7 +14,6 @@ internal/db/test_fk.db
 
 # Go build/workspace files
 go.work
-go.work
 
 # Editor/OS junk
 .vscode/
