@@ -24,3 +24,6 @@ go.work
 # Frontend
 web/node_modules/
 web/dist/
+
+# Env
+.env
