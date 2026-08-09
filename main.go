@@ -2,10 +2,13 @@ package main
 
 import (
 	"log"
+	"net/http"
 
+	"github.com/Dimensionexpert/movieLibrary/internal/cache"
 	"github.com/Dimensionexpert/movieLibrary/internal/db"
 	"github.com/Dimensionexpert/movieLibrary/internal/movie"
 	"github.com/Dimensionexpert/movieLibrary/internal/scanner"
+	"github.com/Dimensionexpert/movieLibrary/web"
 )
 
 func main() {
@@ -29,4 +32,11 @@ func main() {
 		log.Fatalf("failed to insert movies: %v", err)
 	}
 	log.Printf("inserted %d movies into database", inserted)
+
+	movieCache := cache.NewCache(2)
+
+	mux := web.NewMux(store, movieCache)
+	log.Println("starting server on :8080")
+	log.Fatal(http.ListenAndServe(":8080", mux))
+
 }
