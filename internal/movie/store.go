@@ -88,3 +88,28 @@ func (s *Store) GetByID(id int) (Movie, error) {
 	}
 	return m, nil
 }
+
+func (s *Store) GetAll() ([]Movie, error) {
+	rows, err := s.db.Query("SELECT id, title, file_path, duration_seconds, thumbnail_path, tmdb_id, overview, poster_url, release_year, added_at FROM movies")
+	if err != nil {
+		return nil, fmt.Errorf("error querying movies: %w", err)
+	}
+	defer rows.Close()
+
+	var movies []Movie
+
+	for rows.Next() {
+		var m Movie
+		err := rows.Scan(&m.ID, &m.Title, &m.FilePath, &m.DurationSeconds, &m.ThumbnailPath, &m.TMDBID, &m.Overview, &m.PosterURL, &m.ReleaseYear, &m.AddedAt)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning movie row: %w", err)
+		}
+		movies = append(movies, m)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating movie rows: %w", err)
+	}
+
+	return movies, nil
+}

@@ -42,3 +42,15 @@ func handleGetMovie(store *movie.Store, movieCache *cache.Cache) http.HandlerFun
 
 	}
 }
+func handleGetMovies(store *movie.Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		movies, err := store.GetAll()
+		if err != nil {
+			http.Error(w, "Failed to fetch movies", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(movies)
+	}
+}
