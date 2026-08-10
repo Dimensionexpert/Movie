@@ -15,35 +15,13 @@ import (
 )
 
 func main() {
-
 	if err := godotenv.Load(); err != nil {
 		log.Println("no .env file found, relying on real environment variables")
 	}
 
 	apiKey := os.Getenv("TMDB_API_KEY")
 	if apiKey == "" {
-		log.Fatal("TMDB_API_KEY not set")
-	}
-	//temp call
-	tmdbClient := tmdb.NewClient(apiKey)
-	best, err := tmdbClient.SearchMovie("Inception")
-	if err != nil {
-		log.Printf("TMDB search failed: %v", err)
-	} else {
-		log.Printf("best match: [%d] %s (%s)", best.ID, best.Title, best.ReleaseDate)
-
-		details, err := tmdbClient.GetMovieDetails(best.ID)
-		if err != nil {
-			log.Printf("TMDB details failed: %v", err)
-		} else {
-			log.Printf("TMDB movie details: %+v", details)
-
-			if err := store.UpdateFromTMDB(1, details); err != nil {
-				log.Printf("failed to update movie 1 from TMDB: %v", err)
-			} else {
-				log.Println("movie 1 successfully enriched from TMDB")
-			}
-		}
+		log.Println("TMDB_API_KEY not set, skipping TMDB enrichment")
 	}
 
 	database, err := db.OpenDB("data/movielibrary.db")
@@ -57,20 +35,54 @@ func main() {
 
 	files, err := scanner.ScanMovies("/tmp/testmovies")
 	if err != nil {
-		log.Fatalf("scan failed: %v", err)
-	}
-	log.Printf("found %d movie files", len(files))
+		log.Printf("scan failed: %v", err)
+	} else {
+		log.Printf("found %d movie files", len(files))
 
-	inserted, err := store.CreateBatch(files)
-	if err != nil {
-		log.Fatalf("failed to insert movies: %v", err)
+		inserted, err := store.CreateBatch(files)
+		if err != nil {
+			log.Printf("failed to insert movies: %v", err)
+		} else {
+			log.Printf("inserted %d movies into database", inserted)
+		}
 	}
-	log.Printf("inserted %d movies into database", inserted)
+
+	if apiKey != "" {
+		tmdbClient := tmdb.NewClient(apiKey)
+
+		movies, err := store.GetAll()
+		if err != nil {
+			log.Printf("failed to load movies for enrichment: %v", err)
+		} else {
+			for _, m := range movies {
+				if m.TMDBID.Valid {
+					continue
+				}
+
+				match, err := tmdbClient.SearchMovie(m.Title)
+				if err != nil {
+					log.Printf("TMDB search failed for %q: %v", m.Title, err)
+					continue
+				}
+
+				details, err := tmdbClient.GetMovieDetails(match.ID)
+				if err != nil {
+					log.Printf("TMDB details failed for %q: %v", m.Title, err)
+					continue
+				}
+
+				if err := store.UpdateFromTMDB(m.ID, details); err != nil {
+					log.Printf("failed to enrich %q: %v", m.Title, err)
+					continue
+				}
+
+				log.Printf("enriched movie %q from TMDB", m.Title)
+			}
+		}
+	}
 
 	movieCache := cache.NewCache(2)
-
 	mux := web.NewMux(store, movieCache)
 	log.Println("starting server on :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
-
 }

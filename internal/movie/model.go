@@ -14,7 +14,7 @@ type Movie struct {
 	ThumbnailPath   sql.NullString
 	TMDBID          sql.NullInt64
 	Overview        sql.NullString
-	PosterURL       sql.NullString
+	PosterURL       sql.NullString // stores TMDB's relative poster path (e.g. "/xlaY2....jpg"), not a full URL — consumer must prepend https://image.tmdb.org/t/p/{size}/
 	ReleaseYear     sql.NullInt64
 	AddedAt         time.Time
 }

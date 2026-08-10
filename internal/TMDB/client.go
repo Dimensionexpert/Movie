@@ -15,6 +15,7 @@ type Client struct {
 func NewClient(apiKey string) *Client {
 	return &Client{apiKey: apiKey}
 }
+
 // First call to get ID NAME and RELEASE DATE
 type SearchResponse struct {
 	Page         int           `json:"page"`
@@ -36,7 +37,7 @@ type MovieDetails struct {
 	Overview    string  `json:"overview"`
 	ReleaseDate string  `json:"release_date"`
 	Runtime     int     `json:"runtime"`
-	PosterPath  string  `json:"poster_path"`
+	PosterPath  string  `json:"poster_path"` // relative path only, e.g. "/xlaY2....jpg" — prepend https://image.tmdb.org/t/p/{size}/ to get a loadable image
 	Genres      []Genre `json:"genres"`
 }
 
