@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 type Client struct {
@@ -14,23 +15,37 @@ type Client struct {
 func NewClient(apiKey string) *Client {
 	return &Client{apiKey: apiKey}
 }
-
+// First call to get ID NAME and RELEASE DATE
 type SearchResponse struct {
-	Page         int            `json:"page"`
-	Results      []SearchResult `json:"results"`
-	TotalPages   int            `json:"total_pages"`
-	TotalResults int            `json:"total_results"`
+	Page         int           `json:"page"`
+	Results      []SearchMatch `json:"results"`
+	TotalPages   int           `json:"total_pages"`
+	TotalResults int           `json:"total_results"`
 }
 
-type SearchResult struct {
+type SearchMatch struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
-	Overview    string `json:"overview"`
 	ReleaseDate string `json:"release_date"`
-	PosterPath  string `json:"poster_path"`
 }
 
-func (c *Client) SearchMovie(title string) (SearchResult, error) {
+// Second call to get other informations
+type MovieDetails struct {
+	ID          int     `json:"id"`
+	Title       string  `json:"title"`
+	Overview    string  `json:"overview"`
+	ReleaseDate string  `json:"release_date"`
+	Runtime     int     `json:"runtime"`
+	PosterPath  string  `json:"poster_path"`
+	Genres      []Genre `json:"genres"`
+}
+
+type Genre struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+func (c *Client) SearchMovie(title string) (SearchMatch, error) {
 	baseURL := "https://api.themoviedb.org/3/search/movie"
 
 	params := url.Values{}
@@ -41,22 +56,47 @@ func (c *Client) SearchMovie(title string) (SearchResult, error) {
 
 	resp, err := http.Get(fullURL)
 	if err != nil {
-		return SearchResult{}, fmt.Errorf("error calling TMDB search: %w", err)
+		return SearchMatch{}, fmt.Errorf("error calling TMDB search: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return SearchResult{}, fmt.Errorf("TMDB search returned status %d", resp.StatusCode)
+		return SearchMatch{}, fmt.Errorf("TMDB search returned status %d", resp.StatusCode)
 	}
 
 	var result SearchResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return SearchResult{}, fmt.Errorf("error decoding TMDB response: %w", err)
+		return SearchMatch{}, fmt.Errorf("error decoding TMDB response: %w", err)
 	}
 
 	if len(result.Results) == 0 {
-		return SearchResult{}, fmt.Errorf("no TMDB results found for %q", title)
+		return SearchMatch{}, fmt.Errorf("no TMDB results found for %q", title)
 	}
 
 	return result.Results[0], nil
+}
+
+func (c *Client) GetMovieDetails(id int) (MovieDetails, error) {
+	idStr := strconv.Itoa(id)
+	baseURL := "https://api.themoviedb.org/3/movie/"
+	params := url.Values{}
+	params.Set("api_key", c.apiKey)
+	fullURL := baseURL + idStr + "?" + params.Encode()
+
+	resp, err := http.Get(fullURL)
+	if err != nil {
+		return MovieDetails{}, fmt.Errorf("error calling TMDB details: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return MovieDetails{}, fmt.Errorf("TMDB details returned status %d", resp.StatusCode)
+	}
+
+	var result MovieDetails
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return MovieDetails{}, fmt.Errorf("error decoding TMDB response: %w", err)
+	}
+
+	return result, nil
 }

@@ -3,6 +3,9 @@ package movie
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
+
+	tmdb "github.com/Dimensionexpert/movieLibrary/internal/TMDB"
 )
 
 // Store handles database operations for movies.
@@ -112,4 +115,38 @@ func (s *Store) GetAll() ([]Movie, error) {
 	}
 
 	return movies, nil
+}
+
+func extractYear(releaseDate string) sql.NullInt64 {
+	if len(releaseDate) < 4 {
+		return sql.NullInt64{Valid: false}
+	}
+	year, err := strconv.Atoi(releaseDate[:4])
+	if err != nil {
+		return sql.NullInt64{Valid: false}
+	}
+	return sql.NullInt64{Int64: int64(year), Valid: true}
+}
+
+func (s *Store) UpdateFromTMDB(movieID int, details tmdb.MovieDetails) error {
+	_, err := s.db.Exec(
+		`UPDATE movies SET overview = ?, poster_url = ?, release_year = ?, duration_seconds = ?, tmdb_id = ? WHERE id = ?`,
+		details.Overview, details.PosterPath, extractYear(details.ReleaseDate), details.Runtime*60, details.ID, movieID,
+	)
+	if err != nil {
+		return fmt.Errorf("error updating movie %d from TMDB: %w", movieID, err)
+	}
+
+	for _, g := range details.Genres {
+		_, err := s.db.Exec(`INSERT INTO genres (id, name) VALUES (?, ?) ON CONFLICT (id) DO NOTHING`, g.ID, g.Name)
+		if err != nil {
+			return fmt.Errorf("error inserting genre %d: %w", g.ID, err)
+		}
+		_, err = s.db.Exec(`INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?) ON CONFLICT DO NOTHING`, movieID, g.ID)
+		if err != nil {
+			return fmt.Errorf("error linking movie %d to genre %d: %w", movieID, g.ID, err)
+		}
+	}
+
+	return nil
 }

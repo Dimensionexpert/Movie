@@ -24,13 +24,26 @@ func main() {
 	if apiKey == "" {
 		log.Fatal("TMDB_API_KEY not set")
 	}
-
+	//temp call
 	tmdbClient := tmdb.NewClient(apiKey)
 	best, err := tmdbClient.SearchMovie("Inception")
 	if err != nil {
 		log.Printf("TMDB search failed: %v", err)
 	} else {
 		log.Printf("best match: [%d] %s (%s)", best.ID, best.Title, best.ReleaseDate)
+
+		details, err := tmdbClient.GetMovieDetails(best.ID)
+		if err != nil {
+			log.Printf("TMDB details failed: %v", err)
+		} else {
+			log.Printf("TMDB movie details: %+v", details)
+
+			if err := store.UpdateFromTMDB(1, details); err != nil {
+				log.Printf("failed to update movie 1 from TMDB: %v", err)
+			} else {
+				log.Println("movie 1 successfully enriched from TMDB")
+			}
+		}
 	}
 
 	database, err := db.OpenDB("data/movielibrary.db")
