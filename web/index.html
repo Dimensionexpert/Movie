@@ -1,13 +1,24 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
-        <title>movieLibrary test</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>movieLibrary</title>
+        <link rel="stylesheet" href="/style.css" />
     </head>
     <body>
-        <video
-            controls
-            width="800"
-            src="http://localhost:8080/movies/2/stream"
-        ></video>
+        <header class="site-header">
+            <p class="eyebrow" id="film-count">ARCHIVE</p>
+            <h1 class="wordmark">movieLibrary</h1>
+            <p class="tagline">Now screening from the home archive.</p>
+        </header>
+
+        <div class="sprockets"></div>
+
+        <main class="library">
+            <div id="grid" class="movie-grid"></div>
+        </main>
+
+        <script src="/app.js"></script>
     </body>
 </html>

@@ -1,0 +1,319 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #0f0e0b;
+  --surface: #1a1712;
+  --surface-raised: #221e17;
+  --text: #ede6d6;
+  --text-muted: #948c7c;
+  --accent: #e8a33d;
+  --accent-dim: #6b4f22;
+  --rule: #3a3226;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---- Sprocket strip: the signature motif, reused consistently ---- */
+.sprockets {
+  height: 10px;
+  background:
+    radial-gradient(circle at 10px 5px, var(--bg) 3px, transparent 3.5px) 0 0 / 20px 10px repeat-x,
+    var(--rule);
+}
+
+.sprockets-vertical {
+  width: 10px;
+  background:
+    radial-gradient(circle at 5px 10px, var(--bg) 3px, transparent 3.5px) 0 0 / 10px 20px repeat-y,
+    var(--rule);
+}
+
+/* ---- Header ---- */
+.site-header {
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 var(--space-1);
+}
+
+.tagline {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: var(--space-1) 0 0;
+}
+
+/* ---- Grid page ---- */
+.library {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--space-3);
+}
+
+.movie-card {
+  display: block;
+  position: relative;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--surface);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.movie-card:hover,
+.movie-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--accent-dim);
+}
+
+.movie-card .poster-wrap {
+  aspect-ratio: 2 / 3;
+  background: var(--surface-raised);
+  position: relative;
+}
+
+.movie-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.movie-card .no-poster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: var(--font-display);
+  color: var(--text-muted);
+  padding: var(--space-2);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.movie-card .card-label {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: var(--space-2) var(--space-1) var(--space-1);
+  background: linear-gradient(to top, rgba(15, 14, 11, 0.95), transparent);
+}
+
+.movie-card .card-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.movie-card .card-year {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-top: 2px;
+  display: block;
+}
+
+.state-message {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: var(--space-5) 0;
+  text-align: center;
+}
+
+/* ---- Detail page ---- */
+.back-link {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: inline-block;
+  margin-bottom: var(--space-3);
+}
+
+.back-link:hover { color: var(--accent); }
+
+.ticket {
+  display: grid;
+  grid-template-columns: 320px 10px 1fr;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ticket .poster-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ticket .poster-col .no-poster {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  color: var(--text-muted);
+  padding: var(--space-3);
+  text-align: center;
+  background: var(--surface-raised);
+}
+
+.ticket-body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-title {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0 0 var(--space-2);
+}
+
+.meta-row {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.meta-row span::before {
+  content: '·';
+  color: var(--rule);
+  margin-right: var(--space-2);
+}
+
+.meta-row span:first-child::before { content: none; }
+
+.overview {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  max-width: 60ch;
+  margin: 0 0 var(--space-4);
+}
+
+.play-btn {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 0.85rem 1.75rem;
+  border-radius: 2px;
+  font-weight: 500;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.play-btn:hover { background: #f5b854; transform: translateY(-1px); }
+.play-btn::before { content: '▶ '; }
+
+.screening {
+  margin-top: var(--space-4);
+  display: none;
+}
+
+.screening.is-active { display: block; }
+
+.screening video {
+  width: 100%;
+  display: block;
+  border-radius: 2px;
+  background: #000;
+}
+
+.detail-loading,
+.detail-error {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--space-5) 0;
+}
+
+@media (max-width: 720px) {
+  .ticket { grid-template-columns: 1fr; }
+  .ticket .sprockets-vertical { width: 100%; height: 10px;
+    background:
+      radial-gradient(circle at 10px 5px, var(--bg) 3px, transparent 3.5px) 0 0 / 20px 10px repeat-x,
+      var(--rule);
+  }
+  .movie-title { font-size: 1.6rem; }
+}
+
+@media (min-width: 1800px) {
+  body { font-size: 18px; }
+  .wordmark { font-size: 2.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
