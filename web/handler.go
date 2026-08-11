@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/Dimensionexpert/movieLibrary/internal/cache"
@@ -52,5 +53,38 @@ func handleGetMovies(store *movie.Store) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(movies)
+	}
+}
+
+func handleStreamMovie(store *movie.Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqIdStr := r.PathValue("id")
+		reqIdInt, err := strconv.Atoi(reqIdStr)
+		if err != nil {
+			http.Error(w, "Invalid movie ID format", http.StatusBadRequest)
+			return
+		}
+
+		m, err := store.GetByID(reqIdInt)
+		if err != nil {
+			http.Error(w, "Movie not found", http.StatusNotFound)
+			return
+		}
+
+		file, err := os.Open(m.FilePath)
+		if err != nil {
+			http.Error(w, "Could not open video file", http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+
+		stat, err := file.Stat()
+		if err != nil {
+			http.Error(w, "Could not stat video file", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "video/mp4")
+		http.ServeContent(w, r, m.Title, stat.ModTime(), file)
 	}
 }
