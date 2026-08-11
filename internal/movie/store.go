@@ -3,6 +3,7 @@ package movie
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strconv"
 
 	tmdb "github.com/Dimensionexpert/movieLibrary/internal/TMDB"
@@ -149,4 +150,51 @@ func (s *Store) UpdateFromTMDB(movieID int, details tmdb.MovieDetails) error {
 	}
 
 	return nil
+}
+func (s *Store) DeleteMissingMovies(files []MovieFile) (int64, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return 0, fmt.Errorf("error starting transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	rows, err := tx.Query(`SELECT file_path FROM movies`)
+	if err != nil {
+		return 0, fmt.Errorf("error querying existing paths: %w", err)
+	}
+
+	onDisk := make(map[string]bool, len(files))
+	for _, f := range files {
+		onDisk[f.Path] = true
+	}
+
+	var toDelete []string
+	for rows.Next() {
+		var p string
+		if err := rows.Scan(&p); err != nil {
+			rows.Close()
+			return 0, fmt.Errorf("error scanning file path: %w", err)
+		}
+		if !onDisk[p] {
+			toDelete = append(toDelete, p)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return 0, fmt.Errorf("error iterating file paths: %w", err)
+	}
+	rows.Close()
+
+	for _, p := range toDelete {
+		if _, err := tx.Exec(`DELETE FROM movies WHERE file_path = ?`, p); err != nil {
+			return 0, fmt.Errorf("error deleting movie %q: %w", p, err)
+		}
+		log.Printf("removed missing movie: %s", p)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return 0, fmt.Errorf("error committing transaction: %w", err)
+	}
+
+	return int64(len(toDelete)), nil
 }

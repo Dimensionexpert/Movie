@@ -24,6 +24,8 @@ func main() {
 		log.Println("TMDB_API_KEY not set, skipping TMDB enrichment")
 	}
 
+	err := os.MkdirAll("data", 0755)
+
 	database, err := db.OpenDB("data/movielibrary.db")
 	if err != nil {
 		log.Fatalf("failed to open database: %v", err)
@@ -38,6 +40,13 @@ func main() {
 		log.Printf("scan failed: %v", err)
 	} else {
 		log.Printf("found %d movie files", len(files))
+
+		removed, err := store.DeleteMissingMovies(files)
+		if err != nil {
+			log.Printf("failed to reconcile missing movies: %v", err)
+		} else {
+			log.Printf("removed %d missing movies", removed)
+		}
 
 		inserted, err := store.CreateBatch(files)
 		if err != nil {
