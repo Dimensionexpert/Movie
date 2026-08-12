@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>movieLibrary</title>
-<link rel="stylesheet" href="/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>movieLibrary</title>
+  <meta name="description" content="Movie details and playback." />
+  <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body class="detail-page">
+  <div class="page-shell">
+    <header class="site-header detail-header">
+      <a href="/" class="back-link">&larr; back to archive</a>
+    </header>
 
-<header class="site-header">
-  <a href="/" class="back-link">&larr; back to archive</a>
-</header>
+    <main class="detail-shell" id="detail-root">
+      <p class="detail-loading">Loading…</p>
+    </main>
+  </div>
 
-<main class="library" id="detail-root">
-  <p class="detail-loading">Loading…</p>
-</main>
-
-<script src="/detail.js"></script>
+  <script src="/detail.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const TMDB_IMG_BASE = 'https://image.tmdb.org/t/p/w500';
+const TMDB_IMG_BASE = 'https://image.tmdb.org/t/p/w780';
 
 function posterSrc(posterUrl) {
   if (!posterUrl) return null;
@@ -14,7 +14,7 @@ function formatDuration(totalSeconds) {
 
 function escapeHtml(str) {
   const div = document.createElement('div');
-  div.textContent = str;
+  div.textContent = str ?? '';
   return div.innerHTML;
 }
 
@@ -23,13 +23,38 @@ function getMovieId() {
   return params.get('id');
 }
 
+function toggleVideoPlayback() {
+  const video = document.querySelector('#screening video');
+  if (!video) return;
+
+  if (video.paused) {
+    video.play();
+  } else {
+    video.pause();
+  }
+}
+
+function requestVideoFullscreen(video) {
+  if (!video) return;
+
+  const fullScreenMethod =
+    video.requestFullscreen ||
+    video.webkitRequestFullscreen ||
+    video.mozRequestFullScreen ||
+    video.msRequestFullscreen;
+
+  if (typeof fullScreenMethod === 'function') {
+    fullScreenMethod.call(video);
+  }
+}
+
 function render(movie) {
   const root = document.getElementById('detail-root');
   const src = posterSrc(movie.posterUrl);
   const duration = formatDuration(movie.durationSeconds);
 
   const posterMarkup = src
-    ? `<img src="${src}" alt="">`
+    ? `<img src="${src}" alt="${escapeHtml(movie.title)} poster">`
     : `<div class="no-poster">${escapeHtml(movie.title)}</div>`;
 
   const metaParts = [];
@@ -37,26 +62,47 @@ function render(movie) {
   if (duration) metaParts.push(`<span>${duration}</span>`);
 
   root.innerHTML = `
-    <div class="ticket">
+    <article class="ticket">
       <div class="poster-col">${posterMarkup}</div>
-      <div class="sprockets-vertical"></div>
       <div class="ticket-body">
+        <p class="kicker">Now showing</p>
         <h1 class="movie-title">${escapeHtml(movie.title)}</h1>
         <div class="meta-row">${metaParts.join('')}</div>
         <p class="overview">${escapeHtml(movie.overview || 'No synopsis on file.')}</p>
-        <button class="play-btn" id="play-btn">Play</button>
+        <div class="detail-actions">
+          <button class="play-btn" id="play-btn">Play</button>
+        </div>
         <div class="screening" id="screening"></div>
       </div>
-    </div>
+    </article>
   `;
 
-  document.getElementById('play-btn').addEventListener('click', () => {
-    const screening = document.getElementById('screening');
-    if (screening.classList.contains('is-active')) return;
+  const playBtn = document.getElementById('play-btn');
+  const screening = document.getElementById('screening');
 
-    screening.innerHTML = `<video controls autoplay src="/movies/${movie.id}/stream"></video>`;
-    screening.classList.add('is-active');
-    screening.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (playBtn && screening) {
+    playBtn.addEventListener('click', () => {
+      if (screening.classList.contains('is-active')) return;
+
+      screening.innerHTML = `<video controls autoplay src="/movies/${movie.id}/stream"></video>`;
+      screening.classList.add('is-active');
+      screening.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      const video = document.querySelector('#screening video');
+      if (video) {
+        video.addEventListener('play', () => requestVideoFullscreen(video), { once: true });
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (event) => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    const isTypingField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+    if (event.code === 'Space' && !isTypingField) {
+      event.preventDefault();
+      toggleVideoPlayback();
+    }
   });
 }
 

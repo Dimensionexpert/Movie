@@ -4,20 +4,42 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>movieLibrary</title>
+        <meta name="description" content="A clean, poster-led movie archive." />
         <link rel="stylesheet" href="/style.css" />
     </head>
     <body>
-        <header class="site-header">
-            <p class="eyebrow" id="film-count">ARCHIVE</p>
-            <h1 class="wordmark">movieLibrary</h1>
-            <p class="tagline">Now screening from the home archive.</p>
-        </header>
+        <div class="page-shell">
+            <header class="site-header">
+                <div class="brand-row">
+                    <div>
+                        <p class="eyebrow">film archive</p>
+                        <h1 class="wordmark">movieLibrary</h1>
+                    </div>
+                    <div class="library-meta">
+                        <span id="film-count">0 films</span>
+                    </div>
+                </div>
 
-        <div class="sprockets"></div>
+                <div class="toolbar">
+                    <p class="tagline">Curated for nights that deserve a better title card.</p>
+                    <label class="search-box" aria-label="Search movies">
+                        <span>Search</span>
+                        <input id="movie-search" type="search" placeholder="Find a movie…" />
+                    </label>
+                </div>
+            </header>
 
-        <main class="library">
-            <div id="grid" class="movie-grid"></div>
-        </main>
+            <main class="library">
+                <section id="featured" class="featured" aria-live="polite"></section>
+
+                <div class="grid-header">
+                    <h2>Archive</h2>
+                    <p id="results-copy">Latest additions</p>
+                </div>
+
+                <div id="grid" class="movie-grid" aria-live="polite"></div>
+            </main>
+        </div>
 
         <script src="/app.js"></script>
     </body>
