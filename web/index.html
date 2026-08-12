@@ -5,35 +5,44 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>movieLibrary</title>
         <meta name="description" content="A clean, poster-led movie archive." />
-        <link rel="stylesheet" href="/style.css" />
+        <link rel="stylesheet" href="/style.css?v=20260813" />
     </head>
     <body>
         <div class="page-shell">
             <header class="site-header">
-                <div class="brand-row">
-                    <div>
-                        <p class="eyebrow">film archive</p>
-                        <h1 class="wordmark">movieLibrary</h1>
-                    </div>
-                    <div class="library-meta">
-                        <span id="film-count">0 films</span>
-                    </div>
-                </div>
-
-                <div class="toolbar">
-                    <p class="tagline">Curated for nights that deserve a better title card.</p>
-                    <label class="search-box" aria-label="Search movies">
-                        <span>Search</span>
-                        <input id="movie-search" type="search" placeholder="Find a movie…" />
-                    </label>
+                <a class="brand" href="/" aria-label="movieLibrary home">
+                    <span class="brand-mark" aria-hidden="true">m</span>
+                    <span>movieLibrary</span>
+                </a>
+                <div class="header-actions">
+                    <span class="library-meta" id="film-count">0 films</span>
+                    <span class="status-dot" title="Library online"><span></span> library online</span>
                 </div>
             </header>
 
             <main class="library">
+                <section class="library-intro">
+                    <p class="eyebrow">Your private cinema</p>
+                    <div class="intro-row">
+                        <div>
+                            <h1>Something good<br><em>for tonight.</em></h1>
+                            <p>Every film in your collection, beautifully within reach.</p>
+                        </div>
+                        <label class="search-box" aria-label="Search movies">
+                            <span class="search-icon" aria-hidden="true"></span>
+                            <input id="movie-search" type="search" placeholder="Search your library" />
+                            <kbd>⌘ K</kbd>
+                        </label>
+                    </div>
+                </section>
+
                 <section id="featured" class="featured" aria-live="polite"></section>
 
                 <div class="grid-header">
-                    <h2>Archive</h2>
+                    <div>
+                        <p class="eyebrow">The collection</p>
+                        <h2>Browse all films</h2>
+                    </div>
                     <p id="results-copy">Latest additions</p>
                 </div>
 
@@ -41,6 +50,6 @@
             </main>
         </div>
 
-        <script src="/app.js"></script>
+        <script src="/app.js?v=20260813"></script>
     </body>
 </html>

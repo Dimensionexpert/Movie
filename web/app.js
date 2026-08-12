@@ -27,10 +27,13 @@ function movieCard(movie) {
   card.className = 'movie-card';
   card.href = `/detail.html?id=${movie.id}`;
   card.innerHTML = `
-    <div class="poster-wrap">${posterMarkup}</div>
-    <div class="card-label">
+    <div class="poster-wrap">
+      ${posterMarkup}
+      <span class="card-open" aria-hidden="true">↗</span>
+    </div>
+    <div class="card-copy">
       <p class="card-title">${escapeHtml(movie.title)}</p>
-      ${yearMarkup}
+      <div class="card-meta">${yearMarkup || '<span>Film</span>'}</div>
     </div>
   `;
   return card;
@@ -50,11 +53,14 @@ function renderFeatured(movie) {
   const runtime = movie.durationSeconds ? formatDuration(movie.durationSeconds) : null;
 
   featured.innerHTML = `
-    <div class="featured-poster">
-      ${src ? `<img src="${src}" alt="${escapeHtml(movie.title)} poster">` : `<div class="no-poster">${escapeHtml(movie.title)}</div>`}
+    <div class="featured-visual">
+      <div class="featured-poster">
+        ${src ? `<img src="${src}" alt="${escapeHtml(movie.title)} poster">` : `<div class="no-poster">${escapeHtml(movie.title)}</div>`}
+      </div>
+      <span class="featured-index">01 / FEATURED</span>
     </div>
     <div class="featured-copy">
-      <p class="kicker">Featured film</p>
+      <p class="eyebrow">Tonight's pick</p>
       <h2>${escapeHtml(movie.title)}</h2>
       <div class="featured-meta">
         ${movie.releaseYear ? `<span>${movie.releaseYear}</span>` : ''}
@@ -62,7 +68,8 @@ function renderFeatured(movie) {
       </div>
       <p class="featured-overview">${escapeHtml(overview)}</p>
       <div class="featured-actions">
-        <a class="button-link" href="/detail.html?id=${movie.id}">Open details</a>
+        <a class="button-link" href="/detail.html?id=${movie.id}"><span aria-hidden="true">▶</span> Watch now</a>
+        <a class="text-link" href="/detail.html?id=${movie.id}">View details <span aria-hidden="true">→</span></a>
       </div>
     </div>
   `;

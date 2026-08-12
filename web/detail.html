@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>movieLibrary</title>
   <meta name="description" content="Movie details and playback." />
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=20260813">
 </head>
 <body class="detail-page">
   <div class="page-shell">
     <header class="site-header detail-header">
-      <a href="/" class="back-link">&larr; back to archive</a>
+      <a class="brand" href="/" aria-label="movieLibrary home">
+        <span class="brand-mark" aria-hidden="true">m</span>
+        <span>movieLibrary</span>
+      </a>
+      <a href="/" class="back-link"><span aria-hidden="true">←</span> Back to library</a>
     </header>
 
     <main class="detail-shell" id="detail-root">
@@ -18,6 +22,6 @@
     </main>
   </div>
 
-  <script src="/detail.js"></script>
+  <script src="/detail.js?v=20260813"></script>
 </body>
 </html>

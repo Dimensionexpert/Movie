@@ -34,20 +34,6 @@ function toggleVideoPlayback() {
   }
 }
 
-function requestVideoFullscreen(video) {
-  if (!video) return;
-
-  const fullScreenMethod =
-    video.requestFullscreen ||
-    video.webkitRequestFullscreen ||
-    video.mozRequestFullScreen ||
-    video.msRequestFullscreen;
-
-  if (typeof fullScreenMethod === 'function') {
-    fullScreenMethod.call(video);
-  }
-}
-
 function render(movie) {
   const root = document.getElementById('detail-root');
   const src = posterSrc(movie.posterUrl);
@@ -60,21 +46,29 @@ function render(movie) {
   const metaParts = [];
   if (movie.releaseYear) metaParts.push(`<span>${movie.releaseYear}</span>`);
   if (duration) metaParts.push(`<span>${duration}</span>`);
+  if (metaParts.length === 0) metaParts.push('<span>In your library</span>');
 
   root.innerHTML = `
-    <article class="ticket">
-      <div class="poster-col">${posterMarkup}</div>
+    <article class="movie-hero">
+      <div class="poster-col">
+        ${posterMarkup}
+        <span class="poster-badge">Ready to play</span>
+      </div>
       <div class="ticket-body">
-        <p class="kicker">Now showing</p>
+        <p class="eyebrow">From your collection</p>
         <h1 class="movie-title">${escapeHtml(movie.title)}</h1>
         <div class="meta-row">${metaParts.join('')}</div>
-        <p class="overview">${escapeHtml(movie.overview || 'No synopsis on file.')}</p>
-        <div class="detail-actions">
-          <button class="play-btn" id="play-btn">Play</button>
+        <div class="overview-panel">
+          <span class="overview-label">Synopsis</span>
+          <p class="overview">${escapeHtml(movie.overview || 'No synopsis on file.')}</p>
         </div>
-        <div class="screening" id="screening"></div>
+        <div class="detail-actions">
+          <button class="play-btn" id="play-btn"><span aria-hidden="true">▶</span> Play film</button>
+          <span class="play-hint">Space bar toggles playback</span>
+        </div>
       </div>
     </article>
+    <section class="screening" id="screening" aria-live="polite"></section>
   `;
 
   const playBtn = document.getElementById('play-btn');
@@ -84,14 +78,15 @@ function render(movie) {
     playBtn.addEventListener('click', () => {
       if (screening.classList.contains('is-active')) return;
 
-      screening.innerHTML = `<video controls autoplay src="/movies/${movie.id}/stream"></video>`;
+      screening.innerHTML = `
+        <div class="screening-head">
+          <p class="eyebrow">Now playing</p>
+          <span>${escapeHtml(movie.title)}</span>
+        </div>
+        <video controls autoplay src="/movies/${movie.id}/stream"></video>
+      `;
       screening.classList.add('is-active');
       screening.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-      const video = document.querySelector('#screening video');
-      if (video) {
-        video.addEventListener('play', () => requestVideoFullscreen(video), { once: true });
-      }
     });
   }
 
